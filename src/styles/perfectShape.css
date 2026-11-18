@@ -1,0 +1,827 @@
+/* ==========================================
+   PERFECT SHAPE SECTION
+========================================== */
+
+.perfect-shape-section {
+  /* ---- ARROW SYSTEM ----
+     --ps-arrow  : arrow circle ka size (Best Seller jaisa: 46px desktop,
+                  38px tablet, 34px mobile)
+     --ps-pad    : container ki left/right padding
+     --ps-gutter : slider-wrapper ke andar dono taraf arrows ke liye jagah
+                   (desktop/tablet par arrow isi gutter me baithta hai,
+                    mobile par 0 -> arrow slider ke upar overlay)
+     --ps-inset  : arrow ki doori wrapper ke kinare se
+
+     Arrow ki position container ke padding par depend NAHI karti.
+     Wo hamesha slider-wrapper ke andar rehta hai, isliye kisi
+     bhi screen par (ya doosri CSS ke padding badalne par) cut nahi hota. */
+  --ps-arrow: 46px;
+  --ps-pad: 16px;
+  --ps-gutter: 64px;
+  --ps-inset: 8px;
+
+  /* arrow colors (Best Seller slider jaise) */
+  --ps-arrow-bg: #fffdf9;
+  --ps-arrow-hover: #1a1a1a;
+
+  width: 100%;
+
+  padding: 42px 0 34px;
+
+  /* soft teal glow behind the centre disc */
+  background: radial-gradient(
+    ellipse 46% 52% at 50% 46%,
+    #e4f0ef 0%,
+    #f3f8f8 55%,
+    #ffffff 100%
+  );
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+}
+
+/* ==========================================
+   CONTAINER
+========================================== */
+
+.perfect-shape-section .perfect-shape-container {
+  width: 100%;
+  max-width: 1280px;
+
+  margin: 0 auto;
+
+  padding: 0 var(--ps-pad);
+
+  box-sizing: border-box;
+}
+
+/* ==========================================
+   HEADING
+========================================== */
+
+.perfect-shape-heading {
+  margin: 0 0 12px;
+
+  text-align: center;
+
+  font-family: "Jost", sans-serif;
+
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.2;
+
+  letter-spacing: 0.4px;
+
+  color: #111111;
+}
+
+.perfect-shape-heading span {
+  color: #1b6b6a;
+}
+
+/* ==========================================
+   TABS  (Eyeglasses | Sunglasses)
+========================================== */
+
+.ps-tabs {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+
+  gap: 44px;
+
+  width: 100%;
+  max-width: 560px;
+
+  margin: 0 auto 10px;
+
+  border-bottom: 1px solid #cfdcdc;
+}
+
+.ps-tab {
+  appearance: none;
+  -webkit-appearance: none;
+
+  position: relative;
+
+  margin: 0;
+  padding: 12px 8px 13px;
+
+  border: 0;
+  background: transparent;
+
+  font-family: "Jost", sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.2;
+
+  color: #7b8a8a;
+
+  cursor: pointer;
+
+  transition: color 0.25s ease;
+}
+
+.ps-tab::after {
+  content: "";
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+
+  height: 2px;
+
+  background: #1b6b6a;
+
+  transform: scaleX(0);
+  transform-origin: center;
+
+  transition: transform 0.3s ease;
+}
+
+.ps-tab:hover {
+  color: #111111;
+}
+
+.ps-tab.active {
+  color: #111111;
+  font-weight: 600;
+}
+
+.ps-tab.active::after {
+  transform: scaleX(1);
+}
+
+.ps-tab:focus-visible {
+  outline: 2px solid #1b6b6a;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ==========================================
+   PANEL (fade-in when tab changes)
+========================================== */
+
+.ps-panel {
+  width: 100%;
+
+  animation: ps-panel-in 0.4s ease;
+}
+
+@keyframes ps-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================
+   SLIDER WRAPPER
+
+   Dono taraf --ps-gutter jitni padding:
+   yahin arrows baithte hain, stage beech me rehta hai.
+========================================== */
+
+.perfect-shape-section .perfect-shape-slider-wrapper {
+  position: relative;
+
+  width: 100%;
+
+  padding: 0 var(--ps-gutter);
+
+  box-sizing: border-box;
+}
+
+/* ==========================================
+   THREE.JS STAGE
+
+   Height yahin se control hoti hai (aspect-ratio).
+   Camera apne aap fit ho jata hai.
+========================================== */
+
+.ps-stage {
+  position: relative;
+
+  width: 100%;
+  aspect-ratio: 3.2 / 1;
+
+  outline: none;
+
+  /* vertical page scroll allowed, horizontal = drag */
+  touch-action: pan-y;
+
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.ps-stage:focus-visible {
+  outline: 2px solid #1b6b6a;
+  outline-offset: 4px;
+  border-radius: 12px;
+}
+
+.ps-canvas {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  touch-action: pan-y;
+}
+
+.ps-sr-only {
+  position: absolute;
+
+  width: 1px;
+  height: 1px;
+
+  margin: -1px;
+  padding: 0;
+
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+
+  border: 0;
+  list-style: none;
+}
+
+/* ==========================================
+   ARROWS  (prev / next)
+
+   Selector .perfect-shape-section .shape-arrow
+   + !important: doosri global CSS (jisme .shape-arrow /
+   .shape-prev / button ke min-width, left, right ho)
+   isko override na kar sake.
+
+   Style Best Seller arrows jaisa: cream circle (#fffdf9),
+   #e1e1e1 border, soft shadow, hover par dark.
+========================================== */
+
+.perfect-shape-section .shape-arrow {
+  position: absolute !important;
+
+  top: 50% !important;
+  bottom: auto !important;
+
+  z-index: 20;
+
+  /* size lock */
+  width: var(--ps-arrow) !important;
+  height: var(--ps-arrow) !important;
+  min-width: var(--ps-arrow) !important;
+  min-height: var(--ps-arrow) !important;
+  max-width: var(--ps-arrow) !important;
+  max-height: var(--ps-arrow) !important;
+  flex: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 1px solid #e1e1e1;
+  border-radius: 50%;
+
+  background: var(--ps-arrow-bg);
+
+  color: #111111;
+
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+
+  box-sizing: border-box;
+  overflow: visible;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  /* agar JSX me text arrow (‹ ›) ho to */
+  font-family: Arial, sans-serif;
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1;
+
+  cursor: pointer;
+
+  -webkit-tap-highlight-color: transparent;
+
+  transform: translateY(-50%) !important;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+/* tap area bada (touch par easy ho) */
+.perfect-shape-section .shape-arrow::after {
+  content: "";
+
+  position: absolute;
+  inset: -6px;
+
+  border-radius: 50%;
+}
+
+/* wrapper ke kinare se --ps-inset door (wrapper ke ANDAR) */
+.perfect-shape-section .shape-prev {
+  left: var(--ps-inset) !important;
+  right: auto !important;
+}
+
+.perfect-shape-section .shape-next {
+  right: var(--ps-inset) !important;
+  left: auto !important;
+}
+
+/* SVG chevron (JSX me Chevron component ho to): perfect center */
+.perfect-shape-section .shape-arrow svg {
+  display: block;
+
+  width: 46%;
+  height: 46%;
+
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  pointer-events: none;
+}
+
+/* hover sirf un devices par jahan real hover hota hai */
+@media (hover: hover) {
+  .perfect-shape-section .shape-arrow:hover {
+    background: var(--ps-arrow-hover);
+    border-color: var(--ps-arrow-hover);
+
+    color: #ffffff;
+
+    transform: translateY(-50%) scale(1.05) !important;
+  }
+}
+
+.perfect-shape-section .shape-arrow:active {
+  background: var(--ps-arrow-hover);
+  border-color: var(--ps-arrow-hover);
+
+  color: #ffffff;
+
+  transform: translateY(-50%) scale(0.95) !important;
+}
+
+.perfect-shape-section .shape-arrow:focus-visible,
+.perfect-shape-dot:focus-visible {
+  outline: 2px solid #1b6b6a;
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   ACTIVE SHAPE (name + link under the wheel)
+========================================== */
+
+.ps-active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 14px;
+
+  margin-top: 4px;
+}
+
+/* in-row arrows (sirf tab dikhte hain jab JSX me wo block uncomment ho) */
+.ps-nav {
+  display: none;
+}
+
+.ps-active-link {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 2px;
+
+  padding: 10px 34px 11px;
+
+  border: 1px solid #d3dfdf;
+  border-radius: 999px;
+
+  background: #ffffff;
+
+  text-decoration: none;
+
+  box-shadow: 0 4px 14px rgba(27, 107, 106, 0.1);
+
+  animation: ps-name-in 0.35s ease;
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.ps-active-name {
+  font-family: "Jost", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+
+  letter-spacing: 0.3px;
+
+  color: #111111;
+
+  transition: color 0.25s ease;
+}
+
+.ps-active-text {
+  font-family: "Assistant", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+
+  color: #1b6b6a;
+
+  transition: color 0.25s ease;
+}
+
+.ps-active-link:hover {
+  background: #1b6b6a;
+  border-color: #1b6b6a;
+}
+
+.ps-active-link:hover .ps-active-name,
+.ps-active-link:hover .ps-active-text {
+  color: #ffffff;
+}
+
+.ps-active-link:focus-visible {
+  outline: 2px solid #1b6b6a;
+  outline-offset: 3px;
+}
+
+@keyframes ps-name-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ps-active-link,
+  .ps-panel {
+    animation: none;
+  }
+
+  .ps-tab::after,
+  .perfect-shape-section .shape-arrow {
+    transition: none;
+  }
+}
+
+/* ==========================================
+   FALLBACK (WebGL not available)
+========================================== */
+
+.ps-fallback {
+  display: flex;
+  gap: 18px;
+
+  overflow-x: auto;
+
+  padding: 6px 4px 12px;
+
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.ps-fallback::-webkit-scrollbar {
+  display: none;
+}
+
+.ps-fallback-item {
+  flex: 0 0 140px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 8px;
+
+  color: #111111;
+
+  text-decoration: none;
+
+  scroll-snap-align: start;
+}
+
+.ps-fallback-circle {
+  width: 130px;
+  height: 130px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 5px solid #ffffff;
+  border-radius: 50%;
+
+  background: #f5f5f5;
+
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+
+  box-sizing: border-box;
+
+  overflow: hidden;
+}
+
+.ps-fallback-circle img {
+  width: 82%;
+  height: 82%;
+
+  object-fit: contain;
+}
+
+.ps-fallback-name {
+  font-family: "Jost", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ==========================================
+   DOTS
+========================================== */
+
+.perfect-shape-dots {
+  width: 100%;
+
+  margin-top: 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+}
+
+.perfect-shape-dot {
+  appearance: none;
+
+  -webkit-appearance: none;
+
+  width: 9px;
+  height: 9px;
+
+  min-width: 9px;
+  min-height: 9px;
+
+  flex: 0 0 9px;
+
+  display: block;
+
+  margin: 0;
+  padding: 0;
+
+  border: 0;
+
+  border-radius: 50%;
+
+  background: #ccd6d7;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.perfect-shape-dot:hover {
+  background: #9ba9aa;
+}
+
+.perfect-shape-dot.active {
+  background: #1b6b6a;
+
+  transform: scale(1.15);
+}
+
+/* ==========================================================
+   RESPONSIVE  (desktop -> tablet -> mobile)
+
+   Desktop  (>1024) : arrow 46px, wrapper gutter 64px  (arrow gutter me)
+   Tablet   (<=1024): arrow 38px, wrapper gutter 52px
+   Tablet   (<=768) : arrow 38px, wrapper gutter 48px
+   Mobile   (<=600) : arrow 34px, gutter 0 -> slider ke upar overlay
+   ========================================================== */
+
+/* ---------- LARGE TABLET / SMALL LAPTOP  (<= 1024px) ---------- */
+
+@media (max-width: 1024px) {
+  .perfect-shape-section {
+    --ps-arrow: 38px;
+    --ps-pad: 16px;
+    --ps-gutter: 52px;
+    --ps-inset: 6px;
+
+    padding: 38px 0 32px;
+  }
+
+  .perfect-shape-heading {
+    font-size: 27px;
+  }
+
+  .ps-tab {
+    font-size: 19px;
+  }
+
+  .ps-stage {
+    aspect-ratio: 2.75 / 1;
+  }
+
+  .ps-active-name {
+    font-size: 18px;
+  }
+}
+
+/* ---------- TABLET  (<= 768px) ---------- */
+
+@media (max-width: 768px) {
+  .perfect-shape-section {
+    --ps-arrow: 38px;
+    --ps-pad: 12px;
+    --ps-gutter: 48px;
+    --ps-inset: 5px;
+
+    padding: 34px 0 30px;
+  }
+
+  .perfect-shape-heading {
+    font-size: 24px;
+  }
+
+  .ps-tabs {
+    gap: 34px;
+  }
+
+  .ps-tab {
+    font-size: 18px;
+  }
+}
+
+/* ---------- STAGE HEIGHT  (<= 640px) ---------- */
+
+@media (max-width: 640px) {
+  .ps-stage {
+    aspect-ratio: 1.9 / 1;
+  }
+}
+
+/* ---------- MOBILE  (<= 600px) ----------
+   Gutter 0: slider poori width leta hai,
+   arrow slider ke upar (kinare se 12 + 6 = 18px andar).
+   Container ke padding badalne par bhi arrow cut nahi hota. */
+
+@media (max-width: 600px) {
+  .perfect-shape-section {
+    --ps-arrow: 34px;
+    --ps-pad: 12px;
+    --ps-gutter: 0px;
+    --ps-inset: 6px;
+  }
+
+  .perfect-shape-section .shape-arrow {
+    font-size: 22px;
+  }
+}
+
+/* ---------- MOBILE  (<= 520px) ---------- */
+
+@media (max-width: 520px) {
+  .perfect-shape-section {
+    padding: 28px 0 27px;
+  }
+
+  .perfect-shape-heading {
+    margin-bottom: 8px;
+
+    font-size: 20px;
+  }
+
+  .ps-tabs {
+    gap: 28px;
+  }
+
+  .ps-tab {
+    padding: 10px 6px 11px;
+
+    font-size: 16px;
+  }
+
+  .ps-active-link {
+    min-width: 170px;
+
+    padding: 8px 26px 9px;
+  }
+
+  .ps-active-name {
+    font-size: 16px;
+  }
+
+  .ps-active-text {
+    font-size: 12px;
+  }
+
+  /* pill ke dono taraf wale arrows (JSX me uncomment karne par) */
+  .ps-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 34px;
+
+    width: 34px;
+    height: 34px;
+    min-width: 0;
+    min-height: 0;
+
+    padding: 0;
+
+    border: 1px solid #e1e1e1;
+    border-radius: 50%;
+
+    background: #ffffff;
+    color: #111111;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+
+    font-family: Arial, sans-serif;
+    font-size: 22px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .ps-nav:active {
+    background: #1b6b6a;
+    color: #ffffff;
+  }
+
+  .ps-nav:focus-visible {
+    outline: 2px solid #1b6b6a;
+    outline-offset: 2px;
+  }
+
+  .perfect-shape-dots {
+    margin-top: 18px;
+
+    gap: 6px;
+  }
+
+  .perfect-shape-dot {
+    width: 8px;
+    height: 8px;
+
+    min-width: 8px;
+    min-height: 8px;
+
+    flex: 0 0 8px;
+  }
+}
+
+/* ---------- SMALL MOBILE  (<= 400px) ---------- */
+
+@media (max-width: 400px) {
+  .perfect-shape-heading {
+    font-size: 19px;
+  }
+}
+
+/* ---------- VERY SMALL MOBILE  (<= 340px) ---------- */
+
+@media (max-width: 340px) {
+  .perfect-shape-heading {
+    font-size: 18px;
+  }
+}
