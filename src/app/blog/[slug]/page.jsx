@@ -14,8 +14,6 @@ import {
 import "../../../styles/blog.css";
 import "../../../styles/blog-article-content.css";
 
-// Rendered on every request (BLOG_REVALIDATE = 60 in lib/shopify-blog.js), so new or edited
-// articles show up on refresh. If you set BLOG_REVALIDATE > 0, add generateStaticParams back.
 export const revalidate = 60;
 export const dynamicParams = true;
 
