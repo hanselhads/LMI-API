@@ -109,7 +109,7 @@ function buildContact({ product, storeName, lensKind, scheduleLabel, packLabel }
 }
 
 function buildGlasses({ product, productType, storeName, selectedSize }) {
-  const isSun = productType === "sunglasses";
+  const isSun = productType === "sunglasses" || productType === "eyeglasses";
   const noun = isSun ? "sunglasses" : "eyeglasses";
   const sizeKey = selectedSize || product.frameSize;
   const fit = SIZE_NAMES[sizeKey] || sizeKey;
